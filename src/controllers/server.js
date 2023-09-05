@@ -54,6 +54,9 @@ var server = http.createServer(function (req, res) {
             case "edit":
                   editStudent(req, res)
                   break;
+            case "editStudent":
+                  updateStudent(req, res)
+                  break
             default:
                   data = fs.readFileSync("../views/home.html", 'utf-8')
                   res.write(data);
@@ -83,6 +86,21 @@ let editStudent = function (req, res) {
             data = data.replace("{point}", infoStudent.point);
             res.write(data);
             return res.end();
+      })
+}
+
+let updateStudent = function (req, res) {
+      let dataStudent = '';
+      req.on('data', function (chunk) {
+            dataStudent += chunk;
+      });
+      req.on('end', () => {
+            let student = qs.parse(dataStudent)
+            student.point = parseFloat(student.point);
+            Student.findOneAndUpdate({ _id: student.id }, student).then(() => {
+                  displayList(req, res)
+            })
+
       })
 }
 
