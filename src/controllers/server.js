@@ -50,6 +50,10 @@ var server = http.createServer(function (req, res) {
             case "delete":
                   deleteStudent(req, res)
                   break;
+
+            case "edit":
+                  editStudent(req, res)
+                  break;
             default:
                   data = fs.readFileSync("../views/home.html", 'utf-8')
                   res.write(data);
@@ -69,6 +73,19 @@ let deleteStudent = function (req, res) {
       })
 }
 
+let editStudent = function (req, res) {
+      const idStudent = req.url.split("/")[2];
+      Student.findOne({ _id: idStudent }).then((infoStudent) => {
+            let data = fs.readFileSync("../views/edit.html", "utf-8");
+            data = data.replace("{id}", infoStudent._id);
+            data = data.replace("{name}", infoStudent.name);
+            data = data.replace("{address}", infoStudent.address);
+            data = data.replace("{point}", infoStudent.point);
+            res.write(data);
+            return res.end();
+      })
+}
+
 let displayList = function (req, res) {
       Student.find().then((dataStudent) => {
             let students = dataStudent
@@ -80,6 +97,9 @@ let displayList = function (req, res) {
             <td>${element.name}</td>
             <td>${element.address}</td>
             <td>${element.point}</td>
+            <td>
+                  <button onclick="location.href='/edit/${element.id}'" type="button" class="btn btn-warning">Edit</button>
+            </td>
             <td>
                   <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#delete${element.id}">Delete</button>
                   <div class="modal fade" id="delete${element.id}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
